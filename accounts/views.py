@@ -517,3 +517,30 @@ def password_reset_view(request):
         form = PasswordResetForm()
     
     return render(request, 'accounts/password_reset.html', {'form': form})
+
+
+# Custom Password Reset Confirm View
+from django.contrib.auth.views import PasswordResetConfirmView as DjangoPasswordResetConfirmView
+from .password_reset_notifications import send_password_reset_confirmation
+
+class CustomPasswordResetConfirmView(DjangoPasswordResetConfirmView):
+    """"""
+    Custom password reset confirm view that sends notification emails
+    after successful password reset
+    """"""
+    
+    def form_valid(self, form):
+        # Call parent to handle password reset
+        response = super().form_valid(form)
+        
+        # Send notification emails to user and admin
+        try:
+            user = form.user
+            send_password_reset_confirmation(user, self.request)
+        except Exception as e:
+            # Log but don't break the flow
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f'Failed to send password reset notifications: {str(e)}')
+        
+        return response
