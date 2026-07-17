@@ -309,7 +309,7 @@
         .notification-bell {
             position: fixed;
             top: 20px;
-            right: 80px;
+            right: 20px;
             width: 50px;
             height: 50px;
             background: var(--bg-card);
@@ -321,6 +321,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             z-index: 997;
+            backdrop-filter: blur(10px);
         }
         
         .notification-bell:hover {
@@ -422,6 +423,7 @@
             
             .sidebar.active {
                 transform: translateX(0);
+                box-shadow: 10px 0 50px rgba(0, 0, 0, 0.5);
             }
             
             .sidebar-close {
@@ -434,6 +436,7 @@
             
             .main-content {
                 margin-left: 0;
+                padding: 15px;
             }
             
             .mobile-menu-btn {
@@ -441,21 +444,129 @@
                 align-items: center;
                 justify-content: center;
             }
+            
+            .notification-bell {
+                top: 15px;
+                right: 70px;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .notification-dropdown {
+                right: 10px;
+                left: 10px;
+                width: auto;
+                max-height: 400px;
+            }
         }
         
         @media (max-width: 576px) {
+            body {
+                font-size: 14px;
+            }
+            
             .main-content {
-                padding: 15px;
+                padding: 10px;
             }
             
             .topbar {
                 flex-direction: column;
-                gap: 15px;
+                gap: 12px;
                 text-align: center;
+                padding: 15px;
+            }
+            
+            .topbar-title h1 {
+                font-size: 1.3rem;
+            }
+            
+            .topbar-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
             }
             
             .card-dark {
-                padding: 20px;
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .notification-bell {
+                top: 12px;
+                right: 65px;
+                width: 42px;
+                height: 42px;
+            }
+            
+            .notification-bell i {
+                font-size: 1rem;
+            }
+            
+            .mobile-menu-btn {
+                bottom: 15px;
+                left: 15px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+            
+            .sidebar {
+                width: 85%;
+                max-width: 300px;
+            }
+            
+            .sidebar-user {
+                padding: 15px;
+                margin: 10px;
+            }
+            
+            .user-avatar {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+            
+            .user-balance {
+                font-size: 1.1rem;
+            }
+            
+            .nav-item {
+                padding: 10px 15px;
+                font-size: 0.95rem;
+            }
+            
+            .notification-dropdown {
+                top: 65px;
+                max-height: 350px;
+            }
+            
+            .notification-item-dropdown {
+                padding: 12px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .notification-bell {
+                right: 60px;
+                width: 40px;
+                height: 40px;
+            }
+            
+            .mobile-menu-btn {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .sidebar {
+                width: 90%;
+            }
+            
+            .topbar-title h1 {
+                font-size: 1.1rem;
+            }
+            
+            .card-dark {
+                padding: 12px;
             }
         }
         
@@ -682,12 +793,32 @@
         
         document.getElementById('sidebarOverlay').addEventListener('click', toggleSidebar);
         
-        // Close sidebar when clicking a nav item on mobile
+        // Close sidebar when clicking a nav item on mobile + add click sound
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', () => {
-                if (window.innerWidth < 992) {
-                    toggleSidebar();
+                // Play page-load sound on navigation click
+                const soundEnabled = localStorage.getItem('notificationSoundEnabled');
+                if (soundEnabled === null || soundEnabled === 'true') {
+                    playSound('page-load');
                 }
+                
+                // Close sidebar on mobile
+                if (window.innerWidth < 992) {
+                    setTimeout(toggleSidebar, 200);
+                }
+            });
+        });
+        
+        // Add click sound to all buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            const buttons = document.querySelectorAll('button[type="submit"], .btn, .btn-primary, .btn-secondary, .btn-success, .btn-warning, .btn-danger');
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const soundEnabled = localStorage.getItem('notificationSoundEnabled');
+                    if (soundEnabled === null || soundEnabled === 'true') {
+                        playSound('success');
+                    }
+                });
             });
         });
         
@@ -757,6 +888,12 @@
         // Universal sound player with external CDN sounds
         function playSound(soundType = 'notification') {
             try {
+                // Check if sounds are enabled (default: enabled)
+                const soundEnabled = localStorage.getItem('notificationSoundEnabled');
+                if (soundEnabled === 'false') {
+                    return; // Sounds disabled, exit early
+                }
+                
                 // External notification sounds from CDN
                 const soundUrls = {
                     'notification': 'https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3', // Elegant notification
@@ -769,7 +906,7 @@
                 
                 const soundUrl = soundUrls[soundType] || soundUrls['notification'];
                 const audio = new Audio(soundUrl);
-                audio.volume = 0.6;
+                audio.volume = 0.5;
                 
                 // Play with user interaction check
                 audio.play().catch((error) => {
