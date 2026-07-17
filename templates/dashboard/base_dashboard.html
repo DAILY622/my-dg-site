@@ -515,7 +515,11 @@
         {% if user.is_authenticated %}
         <div class="sidebar-user">
             <div class="user-avatar">
-                {{ user.full_name|slice:":1"|upper|default:"?" }}
+                {% if user.profile_image %}
+                    <img src="{{ user.profile_image.url }}" alt="{{ user.full_name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                {% else %}
+                    {{ user.full_name|slice:":1"|upper|default:"?" }}
+                {% endif %}
             </div>
             <div class="user-name">{{ user.full_name|default:user.email }}</div>
             <div class="user-balance">${{ user.balance|floatformat:2|default:"0.00" }}</div>
