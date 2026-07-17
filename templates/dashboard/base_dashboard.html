@@ -275,7 +275,7 @@
             color: var(--gold);
         }
         
-        /* Mobile Menu Button */
+        /* Mobile Menu Button - iOS/Android App Style */
         .mobile-menu-btn {
             display: none;
             position: fixed;
@@ -291,6 +291,12 @@
             z-index: 1100;
             cursor: pointer;
             box-shadow: 0 5px 25px rgba(255, 215, 0, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .mobile-menu-btn:active {
+            transform: scale(0.9);
+            box-shadow: 0 3px 15px rgba(255, 215, 0, 0.3);
         }
         
         .sidebar-close {
@@ -789,38 +795,151 @@
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('sidebarOverlay').classList.toggle('active');
+            
+            // Play UI sound
+            const soundEnabled = localStorage.getItem('notificationSoundEnabled');
+            if (soundEnabled === null || soundEnabled === 'true') {
+                playSound('message');
+            }
         }
         
         document.getElementById('sidebarOverlay').addEventListener('click', toggleSidebar);
         
-        // Close sidebar when clicking a nav item on mobile + add click sound
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => {
-                // Play page-load sound on navigation click
-                const soundEnabled = localStorage.getItem('notificationSoundEnabled');
-                if (soundEnabled === null || soundEnabled === 'true') {
-                    playSound('page-load');
-                }
-                
-                // Close sidebar on mobile
-                if (window.innerWidth < 992) {
-                    setTimeout(toggleSidebar, 200);
-                }
-            });
-        });
+        // ========================================
+        // 🎯 MOBILE APP-LIKE EXPERIENCE
+        // ========================================
         
-        // Add click sound to all buttons
+        // Instant tap feedback with sound (plays BEFORE navigation)
         document.addEventListener('DOMContentLoaded', () => {
-            const buttons = document.querySelectorAll('button[type="submit"], .btn, .btn-primary, .btn-secondary, .btn-success, .btn-warning, .btn-danger');
-            buttons.forEach(button => {
-                button.addEventListener('click', () => {
+            // Add tap sound to ALL clickable elements
+            const clickableElements = document.querySelectorAll('a, button, .nav-item, .clickable');
+            
+            clickableElements.forEach(element => {
+                // Use touchstart for instant mobile response (fires before click)
+                element.addEventListener('touchstart', (e) => {
+                    // Play sound INSTANTLY on touch
                     const soundEnabled = localStorage.getItem('notificationSoundEnabled');
                     if (soundEnabled === null || soundEnabled === 'true') {
-                        playSound('success');
+                        // Determine sound type
+                        if (element.classList.contains('nav-item')) {
+                            playSound('page-load');
+                        } else if (element.tagName === 'BUTTON' || element.classList.contains('btn')) {
+                            playSound('success');
+                        } else if (element.tagName === 'A') {
+                            playSound('page-load');
+                        }
+                    }
+                    
+                    // Add touch feedback animation
+                    element.style.transform = 'scale(0.95)';
+                    element.style.transition = 'transform 0.1s ease';
+                    setTimeout(() => {
+                        element.style.transform = 'scale(1)';
+                    }, 100);
+                }, { passive: true });
+                
+                // Also handle regular clicks for desktop
+                element.addEventListener('click', (e) => {
+                    // Only play if touchstart didn't fire (desktop)
+                    if (!('ontouchstart' in window)) {
+                        const soundEnabled = localStorage.getItem('notificationSoundEnabled');
+                        if (soundEnabled === null || soundEnabled === 'true') {
+                            if (element.classList.contains('nav-item')) {
+                                playSound('page-load');
+                            } else if (element.tagName === 'BUTTON' || element.classList.contains('btn')) {
+                                playSound('success');
+                            } else if (element.tagName === 'A') {
+                                playSound('page-load');
+                            }
+                        }
                     }
                 });
             });
+            
+            // Auto-close sidebar after clicking nav items on mobile
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth < 992) {
+                        setTimeout(toggleSidebar, 300);
+                    }
+                });
+            });
+            
+            // Add ripple effect to navigation items (mobile app feel)
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('touchstart', function(e) {
+                    const ripple = document.createElement('span');
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255, 215, 0, 0.4)';
+                    ripple.style.width = ripple.style.height = '100px';
+                    ripple.style.left = e.touches[0].clientX - this.offsetLeft - 50 + 'px';
+                    ripple.style.top = e.touches[0].clientY - this.offsetTop - 50 + 'px';
+                    ripple.style.animation = 'ripple 0.6s ease-out';
+                    ripple.style.pointerEvents = 'none';
+                    this.style.position = 'relative';
+                    this.style.overflow = 'hidden';
+                    this.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                }, { passive: true });
+            });
         });
+        
+        // Add ripple animation CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                from {
+                    transform: scale(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+            
+            /* App-like touch feedback */
+            .nav-item:active,
+            a:active,
+            button:active {
+                transform: scale(0.95);
+                transition: transform 0.1s ease;
+            }
+            
+            /* Smooth page transitions */
+            .main-content {
+                animation: fadeIn 0.3s ease-in;
+            }
+            
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
+            /* iOS-like momentum scrolling */
+            .sidebar,
+            .main-content,
+            .notification-dropdown {
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Prevent text selection on tap (app-like) */
+            .nav-item,
+            .notification-bell,
+            .mobile-menu-btn {
+                -webkit-user-select: none;
+                user-select: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+        `;
+        document.head.appendChild(style);
         
         {% if user.is_authenticated %}
         // Real-time Notifications
@@ -995,6 +1114,93 @@
         
         document.addEventListener('DOMContentLoaded', loadNotifications);
         {% endif %}
+        
+        // ========================================
+        // 📱 SWIPE GESTURES (Mobile App Feel)
+        // ========================================
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let touchStartY = 0;
+        let touchEndY = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+        
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipe();
+        }, { passive: true });
+        
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const swipeDistanceX = touchEndX - touchStartX;
+            const swipeDistanceY = Math.abs(touchEndY - touchStartY);
+            
+            // Only detect horizontal swipes (not vertical scrolling)
+            if (swipeDistanceY < 100) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                
+                // Swipe right to open sidebar (from left edge)
+                if (swipeDistanceX > swipeThreshold && touchStartX < 50) {
+                    if (sidebar && !sidebar.classList.contains('active')) {
+                        sidebar.classList.add('active');
+                        overlay.classList.add('active');
+                        const soundEnabled = localStorage.getItem('notificationSoundEnabled');
+                        if (soundEnabled === null || soundEnabled === 'true') {
+                            playSound('message');
+                        }
+                    }
+                }
+                
+                // Swipe left to close sidebar
+                if (swipeDistanceX < -swipeThreshold) {
+                    if (sidebar && sidebar.classList.contains('active')) {
+                        sidebar.classList.remove('active');
+                        overlay.classList.remove('active');
+                        const soundEnabled = localStorage.getItem('notificationSoundEnabled');
+                        if (soundEnabled === null || soundEnabled === 'true') {
+                            playSound('message');
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Add pull-to-refresh indicator (visual feedback only)
+        let pullStartY = 0;
+        let pulling = false;
+        
+        window.addEventListener('touchstart', (e) => {
+            if (window.scrollY === 0) {
+                pullStartY = e.touches[0].clientY;
+                pulling = true;
+            }
+        }, { passive: true });
+        
+        window.addEventListener('touchmove', (e) => {
+            if (pulling && window.scrollY === 0) {
+                const pullDistance = e.touches[0].clientY - pullStartY;
+                if (pullDistance > 80) {
+                    // Visual feedback that refresh would happen
+                    document.body.style.transform = `translateY(${Math.min(pullDistance / 3, 30)}px)`;
+                }
+            }
+        }, { passive: true });
+        
+        window.addEventListener('touchend', () => {
+            if (pulling) {
+                pulling = false;
+                document.body.style.transform = 'translateY(0)';
+                document.body.style.transition = 'transform 0.3s ease';
+                setTimeout(() => {
+                    document.body.style.transition = '';
+                }, 300);
+            }
+        }, { passive: true });
     </script>
     
     <!-- Tawk.to Chat Widget -->
