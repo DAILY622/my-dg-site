@@ -4,7 +4,7 @@
 
 services:
   - type: web
-    name: my-site
+    name: elitewealthcapital
     runtime: docker
     plan: starter
     region: oregon
@@ -24,7 +24,7 @@ services:
       - key: SECRET_KEY
         value: django-insecure-elite-wealth-prod-key-2024
       - key: ALLOWED_HOSTS
-        value: localhost,127.0.0.1,elitewealthcapita.uk,www.elitewealthcapita.uk,portal.elitewealthcapita.uk,my-site-gbql.onrender.com,.onrender.com
+        value: localhost,127.0.0.1,elitewealthcapita.uk,www.elitewealthcapita.uk,portal.elitewealthcapita.uk,.onrender.com
       - key: PYTHON_VERSION
         value: "3.12.0"
       
@@ -84,7 +84,7 @@ services:
       
       # CSRF Security
       - key: CSRF_TRUSTED_ORIGINS
-        value: https://elitewealthcapita.uk,https://www.elitewealthcapita.uk,https://portal.elitewealthcapita.uk,https://my-site-gbql.onrender.com
+        value: https://elitewealthcapita.uk,https://www.elitewealthcapita.uk,https://portal.elitewealthcapita.uk
 
   # Cron job to process investments automatically
   - type: cron
