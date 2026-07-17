@@ -524,10 +524,10 @@ from django.contrib.auth.views import PasswordResetConfirmView as DjangoPassword
 from .password_reset_notifications import send_password_reset_confirmation
 
 class CustomPasswordResetConfirmView(DjangoPasswordResetConfirmView):
-    """"""
+    """
     Custom password reset confirm view that sends notification emails
     after successful password reset
-    """"""
+    """
     
     def form_valid(self, form):
         # Call parent to handle password reset
