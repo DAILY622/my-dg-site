@@ -79,14 +79,6 @@ services:
       - key: CLOUDFLARE_WORKER_URL
         value: https://elite-wealth-worker.bthailand998.workers.dev
       
-      # Cloudinary (Backward Compatibility for Existing Images)
-      - key: CLOUDINARY_CLOUD_NAME
-        value: dh5ikf5un
-      - key: CLOUDINARY_API_KEY
-        value: "926391542761186"
-      - key: CLOUDINARY_API_SECRET
-        value: RGBNIYy2_c_wybiwH7-qINfbF5M
-      
       # Tawk.to Live Chat (Optional - leave empty if not using)
       - key: TAWK_PROPERTY_ID
         value: ""
