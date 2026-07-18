@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from kyc.models import KYCDocument
-from investments.models import Deposit, CryptoWallet, AgentApplication
+from investments.models import Deposit, WalletAddress, AgentApplication
 import requests
 import os
 from urllib.parse import urlparse
@@ -204,7 +204,7 @@ class Command(BaseCommand):
 
     def migrate_wallet_qr_codes(self, dry_run):
         """Migrate wallet QR codes"""
-        wallets = CryptoWallet.objects.all()
+        wallets = WalletAddress.objects.all()
         count = 0
         
         for wallet in wallets:
@@ -212,12 +212,12 @@ class Command(BaseCommand):
             if wallet.qr_code:
                 url = wallet.qr_code.url if hasattr(wallet.qr_code, 'url') else str(wallet.qr_code)
                 if self.is_cloudinary_url(url):
-                    self.stdout.write(f"   Wallet {wallet.id} ({wallet.currency})")
+                    self.stdout.write(f"   Wallet {wallet.id} ({wallet.crypto_type})")
                     
                     if not dry_run:
                         content = self.download_image(url)
                         if content:
-                            filename = f"qr_{wallet.currency}_{wallet.id}.png"
+                            filename = f"qr_{wallet.crypto_type}_{wallet.id}.png"
                             wallet.qr_code.save(filename, ContentFile(content), save=True)
                             self.stdout.write(self.style.SUCCESS(f"   ✅ QR code migrated"))
                             count += 1
@@ -231,7 +231,7 @@ class Command(BaseCommand):
                     if not dry_run:
                         content = self.download_image(url)
                         if content:
-                            filename = f"qr_image_{wallet.currency}_{wallet.id}.png"
+                            filename = f"qr_image_{wallet.crypto_type}_{wallet.id}.png"
                             wallet.qr_code_image.save(filename, ContentFile(content), save=True)
                             count += 1
                     else:
