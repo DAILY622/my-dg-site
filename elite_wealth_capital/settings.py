@@ -50,10 +50,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'django_ratelimit',
-    
-    # Cloud Storage
-    'cloudinary_storage',
-    'cloudinary',
+    'storages',  # Django-storages for R2/S3
     
     # Local Apps
     'accounts',
@@ -149,20 +146,37 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
-# Media files (User uploads) - Cloudinary Storage
+# ============ MEDIA FILES - CLOUDFLARE R2 STORAGE ============
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Cloudinary Configuration for user uploads (profile images, KYC documents)
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', ''),
-    'API_KEY': os.getenv('CLOUDINARY_API_KEY', ''),
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', ''),
+# ============ CLOUDFLARE R2 CONFIGURATION (S3-Compatible) ============
+# R2 credentials
+AWS_ACCESS_KEY_ID = os.getenv('R2_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = os.getenv('R2_SECRET_ACCESS_KEY', '')
+AWS_STORAGE_BUCKET_NAME = os.getenv('R2_BUCKET_NAME', 'elite-wealth-media')
+
+# R2 endpoint (NOT AWS S3!)
+AWS_S3_ENDPOINT_URL = os.getenv('R2_ENDPOINT_URL', '')  # https://ACCOUNT_ID.r2.cloudflarestorage.com
+AWS_S3_CUSTOM_DOMAIN = os.getenv('R2_CUSTOM_DOMAIN', '')  # Optional: media.elitewealthcapita.uk
+
+# S3 configuration
+AWS_S3_REGION_NAME = 'auto'  # R2 uses 'auto'
+AWS_S3_SIGNATURE_VERSION = 's3v4'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = 'private'  # Keep files private
+AWS_QUERYSTRING_AUTH = True  # Generate signed URLs for private files
+AWS_QUERYSTRING_EXPIRE = 3600  # Signed URL expires in 1 hour
+
+# Performance
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',  # Cache for 24 hours
 }
 
-# Use Cloudinary for media files (profile images, KYC docs) in production
-if not DEBUG and CLOUDINARY_STORAGE['CLOUD_NAME']:
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# Use R2 for media files in production
+if not DEBUG and AWS_ACCESS_KEY_ID:
+    DEFAULT_FILE_STORAGE = 'elite_wealth_capital.storage_backends.R2MediaStorage'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN or AWS_STORAGE_BUCKET_NAME}/'
 else:
     # Use local storage in development
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

@@ -62,7 +62,19 @@ services:
       - key: DEFAULT_FROM_EMAIL
         value: admin@elitewealthcapita.uk
       
-      # Cloudinary (Media Storage - Profile Images, KYC)
+      # Cloudflare R2 Storage (Media Files - Uploads, KYC, Receipts)
+      - key: R2_ACCESS_KEY_ID
+        value: YOUR_R2_ACCESS_KEY_HERE  # Get from Cloudflare R2 dashboard
+      - key: R2_SECRET_ACCESS_KEY
+        value: YOUR_R2_SECRET_KEY_HERE  # Get from Cloudflare R2 dashboard
+      - key: R2_BUCKET_NAME
+        value: elite-wealth-media
+      - key: R2_ENDPOINT_URL
+        value: YOUR_R2_ENDPOINT_HERE  # https://ACCOUNT_ID.r2.cloudflarestorage.com
+      - key: R2_CUSTOM_DOMAIN
+        value: ""  # Optional: media.elitewealthcapita.uk
+      
+      # Cloudinary (Backward Compatibility for Existing Images)
       - key: CLOUDINARY_CLOUD_NAME
         value: dh5ikf5un
       - key: CLOUDINARY_API_KEY

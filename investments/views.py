@@ -7,9 +7,10 @@ from django.db import transaction
 from .models import (InvestmentPlan, Investment, Deposit, Withdrawal, WalletAddress,
                      Loan, LoanRepayment, VirtualCard, Coupon, AgentApplication, CryptoTicker)
 from decimal import Decimal, InvalidOperation
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse, Http404
 from django_ratelimit.decorators import ratelimit
 from accounts.email_notifications import send_deposit_notification
+from .receipt_generator import generate_receipt
 import urllib.request
 import json
 import logging
@@ -708,3 +709,117 @@ def crypto_ticker_api(request):
                 'change_24h': 0
             })
         return JsonResponse({'success': True, 'tickers': fallback, 'source': 'fallback'})
+
+# ============ PDF RECEIPT DOWNLOAD VIEWS ============
+
+@login_required
+def download_deposit_receipt(request, deposit_id):
+    """Download PDF receipt for a deposit"""
+    deposit = get_object_or_404(Deposit, id=deposit_id, user=request.user)
+    
+    try:
+        # Generate PDF
+        pdf_buffer = generate_receipt('deposit', deposit)
+        
+        # Create filename
+        filename = f"deposit_receipt_{deposit.id}_{deposit.created_at.strftime('%Y%m%d')}.pdf"
+        
+        # Return PDF as download
+        response = FileResponse(pdf_buffer, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error generating deposit receipt {deposit_id}: {str(e)}")
+        messages.error(request, "Error generating receipt. Please try again later.")
+        return redirect('investments:my_investments')
+
+
+@login_required
+def download_investment_receipt(request, investment_id):
+    """Download PDF certificate for an investment"""
+    investment = get_object_or_404(Investment, id=investment_id, user=request.user)
+    
+    try:
+        # Generate PDF
+        pdf_buffer = generate_receipt('investment', investment)
+        
+        # Create filename
+        filename = f"investment_certificate_{investment.id}_{investment.start_date.strftime('%Y%m%d')}.pdf"
+        
+        # Return PDF as download
+        response = FileResponse(pdf_buffer, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error generating investment certificate {investment_id}: {str(e)}")
+        messages.error(request, "Error generating certificate. Please try again later.")
+        return redirect('investments:my_investments')
+
+
+@login_required
+def download_withdrawal_receipt(request, withdrawal_id):
+    """Download PDF receipt for a withdrawal"""
+    withdrawal = get_object_or_404(Withdrawal, id=withdrawal_id, user=request.user)
+    
+    try:
+        # Generate PDF
+        pdf_buffer = generate_receipt('withdrawal', withdrawal)
+        
+        # Create filename
+        filename = f"withdrawal_receipt_{withdrawal.id}_{withdrawal.created_at.strftime('%Y%m%d')}.pdf"
+        
+        # Return PDF as download
+        response = FileResponse(pdf_buffer, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error generating withdrawal receipt {withdrawal_id}: {str(e)}")
+        messages.error(request, "Error generating receipt. Please try again later.")
+        return redirect('investments:my_investments')
+
+
+@login_required
+def view_deposit_receipt(request, deposit_id):
+    """View PDF receipt for a deposit in browser"""
+    deposit = get_object_or_404(Deposit, id=deposit_id, user=request.user)
+    
+    try:
+        # Generate PDF
+        pdf_buffer = generate_receipt('deposit', deposit)
+        
+        # Create filename
+        filename = f"deposit_receipt_{deposit.id}_{deposit.created_at.strftime('%Y%m%d')}.pdf"
+        
+        # Return PDF for viewing in browser
+        response = FileResponse(pdf_buffer, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{filename}"'
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error viewing deposit receipt {deposit_id}: {str(e)}")
+        raise Http404("Receipt not available")
+
+
+@login_required
+def view_investment_receipt(request, investment_id):
+    """View PDF certificate for an investment in browser"""
+    investment = get_object_or_404(Investment, id=investment_id, user=request.user)
+    
+    try:
+        # Generate PDF
+        pdf_buffer = generate_receipt('investment', investment)
+        
+        # Create filename
+        filename = f"investment_certificate_{investment.id}_{investment.start_date.strftime('%Y%m%d')}.pdf"
+        
+        # Return PDF for viewing in browser
+        response = FileResponse(pdf_buffer, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{filename}"'
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error viewing investment certificate {investment_id}: {str(e)}")
+        raise Http404("Certificate not available")

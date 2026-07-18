@@ -19,6 +19,13 @@ urlpatterns = [
     path('cards/', views.virtual_cards, name='cards'),
     path('agent/', views.agent_page, name='agent'),
     
+    # PDF Receipt Downloads
+    path('receipt/deposit/<int:deposit_id>/download/', views.download_deposit_receipt, name='download_deposit_receipt'),
+    path('receipt/investment/<int:investment_id>/download/', views.download_investment_receipt, name='download_investment_receipt'),
+    path('receipt/withdrawal/<int:withdrawal_id>/download/', views.download_withdrawal_receipt, name='download_withdrawal_receipt'),
+    path('receipt/deposit/<int:deposit_id>/', views.view_deposit_receipt, name='view_deposit_receipt'),
+    path('receipt/investment/<int:investment_id>/', views.view_investment_receipt, name='view_investment_receipt'),
+    
     # API endpoints
     path('api/ticker/', views.crypto_ticker_api, name='crypto_ticker_api'),
     path('api/deposit-status/<int:deposit_id>/', views.check_deposit_status_api, name='check_deposit_status'),
