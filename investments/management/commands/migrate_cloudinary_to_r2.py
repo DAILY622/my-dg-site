@@ -7,10 +7,12 @@ Usage: python manage.py migrate_cloudinary_to_r2 [--dry-run]
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
+from django.conf import settings
 from kyc.models import KYCDocument
 from investments.models import Deposit, WalletAddress, AgentApplication
 import requests
 import os
+import re
 from urllib.parse import urlparse
 
 User = get_user_model()
@@ -77,7 +79,32 @@ class Command(BaseCommand):
         """Check if URL is from Cloudinary"""
         if not url:
             return False
-        return 'cloudinary.com' in url or 'res.cloudinary.com' in url
+        url_str = str(url)
+        # Check for full Cloudinary URLs
+        if 'cloudinary.com' in url_str or 'res.cloudinary.com' in url_str:
+            return True
+        # Check for local paths with Cloudinary transformation IDs (e.g., _y4x90x, _fh54qy)
+        # These indicate files stored via Cloudinary but saved as local references
+        import re
+        if re.search(r'_[a-z0-9]{6}$', os.path.basename(url_str)):
+            return True
+        return False
+    
+    def get_cloudinary_url(self, local_path):
+        """Reconstruct Cloudinary URL from local path with transformation ID"""
+        # Extract filename from path
+        filename = os.path.basename(str(local_path))
+        
+        # Get Cloudinary settings from Django settings
+        cloud_name = getattr(settings, 'CLOUDINARY_CLOUD_NAME', os.getenv('CLOUDINARY_CLOUD_NAME'))
+        
+        if not cloud_name:
+            # If no cloud name, try to download from media URL
+            return f"{settings.MEDIA_URL}{local_path}" if hasattr(settings, 'MEDIA_URL') else None
+        
+        # Cloudinary URLs are: https://res.cloudinary.com/{cloud_name}/image/upload/{public_id}
+        # The filename already has the transformation ID, use it as-is
+        return f"https://res.cloudinary.com/{cloud_name}/image/upload/{filename}"
 
     def download_image(self, url):
         """Download image from URL"""
@@ -98,15 +125,21 @@ class Command(BaseCommand):
             url = user.profile_image.url if hasattr(user.profile_image, 'url') else str(user.profile_image)
             
             if self.is_cloudinary_url(url):
+                # Get full Cloudinary URL if it's a local reference
+                if not url.startswith('http'):
+                    cloudinary_url = self.get_cloudinary_url(url)
+                else:
+                    cloudinary_url = url
+                
                 self.stdout.write(f"   User {user.id}: {user.email}")
-                self.stdout.write(f"   FROM: {url[:80]}...")
+                self.stdout.write(f"   FROM: {cloudinary_url[:80] if cloudinary_url else url[:80]}...")
                 
                 if not dry_run:
                     # Download from Cloudinary
-                    content = self.download_image(url)
+                    content = self.download_image(cloudinary_url) if cloudinary_url else None
                     if content:
                         # Get filename
-                        filename = os.path.basename(urlparse(url).path)
+                        filename = os.path.basename(urlparse(cloudinary_url).path) if cloudinary_url else f"profile_{user.id}.jpg"
                         if not filename:
                             filename = f"profile_{user.id}.jpg"
                         
