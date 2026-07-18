@@ -1,0 +1,238 @@
+/**
+ * Mobile Responsive Fixes
+ * Elite Wealth Capital - Fix mobile UI issues
+ */
+
+/* ========================================
+   TAWK.TO CHAT WIDGET - MOBILE FIX
+   ======================================== */
+
+/* Fix: Tawk.to widget too large on mobile */
+@media (max-width: 768px) {
+    /* Tawk.to bubble button size fix */
+    #tawk-bubble-container {
+        transform: scale(0.75) !important;
+        transform-origin: bottom right !important;
+        bottom: 70px !important; /* Above mobile nav */
+    }
+    
+    /* Alternative: If using iframe */
+    iframe[title="chat widget"] {
+        transform: scale(0.75) !important;
+        transform-origin: bottom right !important;
+        bottom: 70px !important;
+    }
+    
+    /* Tawk widget container positioning */
+    .tawk-min-container {
+        bottom: 75px !important;
+        right: 15px !important;
+    }
+    
+    /* Tawk maximized chat window */
+    .tawk-chat-panel {
+        max-height: calc(100vh - 150px) !important;
+        bottom: 70px !important;
+    }
+}
+
+/* ========================================
+   DASHBOARD ICON - MOBILE FIX
+   ======================================== */
+
+/* Ensure dashboard icon is visible on mobile */
+@media (max-width: 768px) {
+    /* Dashboard button in mobile nav */
+    .mobile-nav-dark button[onclick*="dashboard"],
+    .mobile-nav-dark a[href*="dashboard"] {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    /* Dashboard icon sizing */
+    .mobile-nav-dark button i.fa-th,
+    .mobile-nav-dark button i.fa-dashboard,
+    .mobile-nav-dark button i.fa-tachometer {
+        font-size: 1.5rem !important;
+        display: inline-block !important;
+    }
+    
+    /* Force show dashboard link */
+    nav[class*="mobile"] a[href="/dashboard/"],
+    nav[class*="mobile"] a[href="/dashboard"] {
+        display: flex !important;
+    }
+}
+
+/* ========================================
+   MOBILE NAVIGATION ENHANCEMENTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Mobile nav bar */
+    .mobile-nav-dark {
+        padding: 8px 0;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+        z-index: 9999 !important;
+    }
+    
+    /* Mobile nav buttons */
+    .mobile-nav-dark button,
+    .mobile-nav-dark a {
+        min-width: 60px;
+        padding: 10px 5px;
+    }
+    
+    /* Mobile nav icons */
+    .mobile-nav-dark i {
+        font-size: 1.4rem !important;
+        margin-bottom: 3px;
+    }
+    
+    /* Mobile nav text */
+    .mobile-nav-dark span {
+        font-size: 0.65rem;
+        white-space: nowrap;
+    }
+    
+    /* Active state */
+    .mobile-nav-dark .active {
+        color: var(--gold, #FFD700) !important;
+        background: rgba(255, 215, 0, 0.15);
+    }
+}
+
+/* ========================================
+   RESPONSIVE IMPROVEMENTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Adjust content padding for mobile nav */
+    body {
+        padding-bottom: 70px;
+    }
+    
+    /* Drawer menu z-index */
+    .drawer-dark {
+        z-index: 9998 !important;
+    }
+    
+    /* Backdrop z-index */
+    .drawer-dark-backdrop {
+        z-index: 9997 !important;
+    }
+    
+    /* Page content spacing */
+    .dashboard-theme-page {
+        padding-bottom: 85px !important;
+    }
+    
+    /* Cards on mobile */
+    .card-dark {
+        padding: 15px;
+        border-radius: 15px;
+    }
+    
+    /* Page headers on mobile */
+    .page-header-gold {
+        padding: 15px 20px;
+        border-radius: 15px;
+    }
+    
+    .page-header-gold h1 {
+        font-size: 1.3rem !important;
+    }
+    
+    .page-header-gold h2 {
+        font-size: 1.1rem !important;
+    }
+}
+
+/* ========================================
+   SMALL MOBILE (< 480px)
+   ======================================== */
+
+@media (max-width: 480px) {
+    /* Extra small screens */
+    .mobile-nav-dark button,
+    .mobile-nav-dark a {
+        min-width: 50px;
+        padding: 8px 3px;
+    }
+    
+    .mobile-nav-dark i {
+        font-size: 1.2rem !important;
+    }
+    
+    .mobile-nav-dark span {
+        font-size: 0.6rem;
+    }
+    
+    /* Tawk widget even smaller */
+    #tawk-bubble-container {
+        transform: scale(0.65) !important;
+    }
+    
+    iframe[title="chat widget"] {
+        transform: scale(0.65) !important;
+    }
+}
+
+/* ========================================
+   LANDSCAPE MODE FIXES
+   ======================================== */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    /* Adjust for landscape */
+    #tawk-bubble-container,
+    iframe[title="chat widget"] {
+        bottom: 60px !important;
+        right: 10px !important;
+    }
+    
+    .tawk-chat-panel {
+        max-height: calc(100vh - 120px) !important;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+/* Touch targets minimum size */
+@media (max-width: 768px) {
+    .mobile-nav-dark button,
+    .mobile-nav-dark a {
+        min-height: 48px;
+        touch-action: manipulation;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .mobile-nav-dark {
+        border-top-width: 2px;
+    }
+    
+    .mobile-nav-dark button,
+    .mobile-nav-dark a {
+        border: 1px solid transparent;
+    }
+    
+    .mobile-nav-dark .active {
+        border-color: var(--gold, #FFD700);
+    }
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+    .mobile-nav-dark,
+    #tawk-bubble-container,
+    iframe[title="chat widget"] {
+        display: none !important;
+    }
+}
