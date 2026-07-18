@@ -17,6 +17,11 @@ urlpatterns = [
     path('loans/', views.loan_application, name='loans'),
     path('loans/<int:loan_id>/repay/', views.loan_repay, name='loan_repay'),
     path('cards/', views.virtual_cards, name='cards'),
+    path('cards/freeze/', views.freeze_card, name='freeze_card'),
+    path('cards/unfreeze/', views.unfreeze_card, name='unfreeze_card'),
+    path('cards/topup/', views.top_up_card, name='top_up_card'),
+    path('cards/replace/', views.replace_card, name='replace_card'),
+    path('cards/transactions/', views.card_transactions, name='card_transactions'),
     path('agent/', views.agent_page, name='agent'),
     
     # PDF Receipt Downloads

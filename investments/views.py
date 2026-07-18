@@ -5,7 +5,8 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from .models import (InvestmentPlan, Investment, Deposit, Withdrawal, WalletAddress,
-                     Loan, LoanRepayment, VirtualCard, Coupon, AgentApplication, CryptoTicker)
+                     Loan, LoanRepayment, VirtualCard, Coupon, AgentApplication, CryptoTicker,
+                     CardTransaction)
 from decimal import Decimal, InvalidOperation
 from django.http import JsonResponse, FileResponse, Http404
 from django_ratelimit.decorators import ratelimit
@@ -980,3 +981,105 @@ def view_investment_receipt(request, investment_id):
     except Exception as e:
         logger.error(f"Error viewing investment certificate {investment_id}: {str(e)}")
         raise Http404("Certificate not available")
+
+
+@login_required
+def freeze_card(request):
+    """Freeze virtual card"""
+    try:
+       card = get_object_or_404(VirtualCard, user=request.user)
+       if card.freeze():
+           messages.success(request, 'Card frozen successfully.')
+       else:
+           messages.error(request, 'Cannot freeze card.')
+    except VirtualCard.DoesNotExist:
+       messages.error(request, 'No virtual card found.')
+    
+    return redirect('investments:cards')
+
+
+@login_required
+def unfreeze_card(request):
+    """Unfreeze virtual card"""
+    try:
+       card = get_object_or_404(VirtualCard, user=request.user)
+       if card.unfreeze():
+           messages.success(request, 'Card unfrozen successfully.')
+       else:
+           messages.error(request, 'Cannot unfreeze card.')
+    except VirtualCard.DoesNotExist:
+       messages.error(request, 'No virtual card found.')
+    
+    return redirect('investments:cards')
+
+
+@login_required
+def top_up_card(request):
+    """Top up virtual card"""
+    if request.method == 'POST':
+       try:
+           amount = Decimal(request.POST.get('amount', 0))
+           card = get_object_or_404(VirtualCard, user=request.user)
+            
+           if amount <= 0:
+               messages.error(request, 'Invalid amount.')
+           elif amount > request.user.balance:
+               messages.error(request, 'Insufficient balance.')
+           else:
+               with transaction.atomic():
+                   request.user.balance -= amount
+                   request.user.save()
+                   card.top_up(amount)
+                    
+                   CardTransaction.objects.create(
+                       card=card,
+                       transaction_type='topup',
+                       amount=amount,
+                       description='Card top-up',
+                       reference_id=f"TOPUP-{card.id}-{timezone.now().timestamp()}",
+                       status='completed'
+                   )
+                    
+                   messages.success(request, f'${amount} transferred to card.')
+       except VirtualCard.DoesNotExist:
+           messages.error(request, 'No virtual card found.')
+       except (ValueError, InvalidOperation):
+           messages.error(request, 'Invalid amount format.')
+    
+    return redirect('investments:cards')
+
+
+@login_required
+def replace_card(request):
+    """Request card replacement"""
+    try:
+       card = get_object_or_404(VirtualCard, user=request.user)
+        
+       # Generate new card number but keep same user
+       old_card_number = card.card_number
+       card.card_number = '4' + ''.join([str(__import__('random').randint(0, 9)) for _ in range(15)])
+       card.cvv = ''.join([str(__import__('random').randint(0, 9)) for _ in range(3)])
+       card.save()
+        
+       messages.success(request, 'Card replaced successfully. New card number has been generated.')
+    except VirtualCard.DoesNotExist:
+       messages.error(request, 'No virtual card found.')
+    
+    return redirect('investments:cards')
+
+
+@login_required
+def card_transactions(request):
+    """View card transaction history"""
+    try:
+       card = get_object_or_404(VirtualCard, user=request.user)
+       transactions = card.transactions.all().order_by('-created_at')[:50]
+        
+       context = {
+           'card': card,
+           'transactions': transactions,
+       }
+       return render(request, 'investments/card_transactions.html', context)
+    except VirtualCard.DoesNotExist:
+       messages.error(request, 'No virtual card found.')
+       return redirect('investments:cards')

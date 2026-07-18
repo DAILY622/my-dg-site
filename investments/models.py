@@ -514,6 +514,57 @@ class VirtualCard(models.Model):
         if self.card_number:
             return f"**** **** **** {self.card_number[-4:]}"
         return ""
+    
+    @property
+    def display_balance(self):
+        """Return formatted balance for display"""
+        return f"${self.balance:,.2f}"
+    
+    @property
+    def is_frozen(self):
+        """Check if card is frozen"""
+        return self.status == 'frozen'
+    
+    @property
+    def is_active(self):
+        """Check if card is active"""
+        return self.status == 'active'
+    
+    def freeze(self):
+        """Freeze the card"""
+        if self.status == 'active':
+            self.status = 'frozen'
+            self.save()
+            return True
+        return False
+    
+    def unfreeze(self):
+        """Unfreeze the card"""
+        if self.status == 'frozen':
+            self.status = 'active'
+            self.save()
+            return True
+        return False
+    
+    def top_up(self, amount):
+        """Top up card from user balance"""
+        if amount <= 0:
+            return False, 'Invalid amount'
+        if self.status != 'active':
+            return False, 'Card is not active'
+        self.balance += amount
+        self.save()
+        return True, 'Top-up successful'
+    
+    def withdraw(self, amount):
+        """Withdraw from card balance"""
+        if amount <= 0:
+            return False, 'Invalid amount'
+        if self.balance < amount:
+            return False, 'Insufficient balance'
+        self.balance -= amount
+        self.save()
+        return True, 'Withdrawal successful'
 
 
 class Coupon(models.Model):
@@ -747,3 +798,45 @@ class CryptoTicker(models.Model):
     
     def __str__(self):
         return f"{self.symbol} ({self.name})"
+
+
+class CardTransaction(models.Model):
+    """Virtual card transaction history"""
+    
+    TRANSACTION_TYPE_CHOICES = [
+        ('topup', 'Top-up'),
+        ('purchase', 'Purchase'),
+        ('withdrawal', 'Withdrawal'),
+        ('refund', 'Refund'),
+        ('fee', 'Fee'),
+    ]
+    
+    card = models.ForeignKey(VirtualCard, on_delete=models.CASCADE, related_name='transactions')
+    transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPE_CHOICES)
+    amount = models.DecimalField(max_digits=15, decimal_places=2, validators=[MinValueValidator(0)])
+    merchant_name = models.CharField(max_length=255, blank=True)
+    description = models.TextField(blank=True)
+    reference_id = models.CharField(max_length=100, unique=True)
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', 'Pending'),
+            ('completed', 'Completed'),
+            ('failed', 'Failed'),
+            ('reversed', 'Reversed'),
+        ],
+        default='completed'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'Card Transaction'
+        verbose_name_plural = 'Card Transactions'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['card', 'created_at']),
+            models.Index(fields=['reference_id']),
+        ]
+    
+    def __str__(self):
+        return f"{self.card.masked_number} - {self.transaction_type} - ${self.amount}"
