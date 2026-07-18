@@ -2,8 +2,16 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 from .models import KYCDocument
 from accounts.email_notifications import send_deposit_notification
+import requests
+import json
+import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/jpg']
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
@@ -84,9 +92,6 @@ def upload_kyc(request):
                 status='submitted'
             )
         
-        # Send admin notification
-        send_kyc_notification(kyc_doc)
-        
         messages.success(request, 'KYC documents uploaded successfully! We will review them within 24-48 hours.')
         return redirect('kyc:status')
     
@@ -104,3 +109,127 @@ def kyc_status(request):
     return render(request, 'kyc/status.html', {
         'kyc_document': kyc_document
     })
+
+
+@login_required
+def kyc_ai_verify(request):
+    """KYC AI verification using Cloudflare Workers AI"""
+    if request.method == 'POST':
+        document_type = request.POST.get('document_type')
+        document_image = request.FILES.get('document_image')
+        
+        if not all([document_type, document_image]):
+            messages.error(request, 'Document type and image are required.')
+            return redirect('kyc:ai_verify')
+        
+        # Validate file
+        try:
+            validate_uploaded_file(document_image, 'Document image')
+        except ValidationError as e:
+            messages.error(request, str(e))
+            return redirect('kyc:ai_verify')
+        
+        # Send to Cloudflare Worker for AI extraction
+        extracted_data = extract_document_data(document_image, document_type)
+        
+        if extracted_data.get('success'):
+            confidence_score = extracted_data.get('confidence', 0)
+            extracted_fields = extracted_data.get('data', {})
+            
+            # Auto-approve if confidence > 85%
+            if confidence_score > 85:
+                auto_approved = True
+                # Create or update KYC document with extracted data
+                kyc_doc, created = KYCDocument.objects.get_or_create(user=request.user)
+                kyc_doc.document_type = document_type
+                kyc_doc.document_number = extracted_fields.get('document_number', '')
+                kyc_doc.issuing_country = extracted_fields.get('country', '')
+                kyc_doc.nationality = extracted_fields.get('nationality', '')
+                kyc_doc.date_of_birth = extracted_fields.get('date_of_birth')
+                kyc_doc.issue_date = extracted_fields.get('issue_date')
+                kyc_doc.expires_at = extracted_fields.get('expiry_date')
+                kyc_doc.status = 'verified'
+                kyc_doc.save()
+                
+                messages.success(request, 'KYC verification successful! Your documents have been auto-approved.')
+            else:
+                auto_approved = False
+                messages.warning(
+                    request, 
+                    f'Confidence score: {confidence_score}%. Document requires manual review.'
+                )
+            
+            context = {
+                'confidence_score': confidence_score,
+                'extracted_data': extracted_fields,
+                'auto_approved': auto_approved,
+                'document_type': document_type,
+            }
+            return render(request, 'kyc/verify_ai_result.html', context)
+        else:
+            error_message = extracted_data.get('error', 'Failed to extract document data')
+            messages.error(request, error_message)
+            return redirect('kyc:ai_verify')
+    
+    return render(request, 'kyc/verify_ai.html')
+
+
+def extract_document_data(image_file, document_type):
+    """Call Cloudflare Workers AI to extract document data"""
+    try:
+        cloudflare_url = os.getenv('CLOUDFLARE_WORKER_URL', '')
+        api_token = os.getenv('CLOUDFLARE_API_TOKEN', '')
+        
+        if not cloudflare_url:
+            return {
+                'success': False,
+                'error': 'Cloudflare Worker not configured'
+            }
+        
+        # Read image file as binary
+        image_file.seek(0)
+        image_data = image_file.read()
+        
+        # Prepare request to Cloudflare Worker
+        headers = {
+            'Authorization': f'Bearer {api_token}',
+        }
+        
+        files = {
+            'document': image_data,
+            'document_type': (None, document_type),
+        }
+        
+        response = requests.post(
+            f'{cloudflare_url}/kyc-extract',
+            headers=headers,
+            files=files,
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            result = response.json()
+            return {
+                'success': True,
+                'confidence': result.get('confidence_score', 0),
+                'data': result.get('extracted_data', {}),
+            }
+        else:
+            logger.error(f"Cloudflare Worker error: {response.status_code} - {response.text}")
+            return {
+                'success': False,
+                'error': 'AI extraction service unavailable. Please try again later.'
+            }
+    
+    except requests.RequestException as e:
+        logger.error(f"KYC AI extraction error: {str(e)}")
+        return {
+            'success': False,
+            'error': 'Failed to connect to AI service. Please try again later.'
+        }
+    except Exception as e:
+        logger.error(f"Unexpected error in extract_document_data: {str(e)}")
+        return {
+            'success': False,
+            'error': 'An unexpected error occurred'
+        }

@@ -1,0 +1,243 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}KYC AI Verification{% endblock %}
+
+{% block extra_css %}
+<style>
+    .kyc-container {
+        max-width: 600px;
+        margin: 40px auto;
+    }
+    
+    .kyc-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .kyc-header h1 {
+        color: var(--gold);
+        margin-bottom: 10px;
+    }
+    
+    .kyc-header p {
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 10px;
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 500;
+    }
+    
+    .form-group select,
+    .form-group input[type="file"] {
+        width: 100%;
+        padding: 12px;
+        background: var(--bg-card);
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        color: white;
+        font-size: 0.95rem;
+    }
+    
+    .form-group select:focus,
+    .form-group input[type="file"]:focus {
+        outline: none;
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+    }
+    
+    .file-upload-area {
+        border: 2px dashed var(--border-color);
+        border-radius: 12px;
+        padding: 40px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .file-upload-area:hover {
+        border-color: var(--gold);
+        background: rgba(255, 215, 0, 0.05);
+    }
+    
+    .file-upload-area i {
+        font-size: 3rem;
+        color: var(--gold);
+        margin-bottom: 15px;
+        display: block;
+    }
+    
+    .file-upload-area p {
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0;
+    }
+    
+    .benefits {
+        background: rgba(76, 175, 80, 0.1);
+        border-left: 4px solid #4caf50;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .benefits h3 {
+        color: #4caf50;
+        margin-top: 0;
+    }
+    
+    .benefits ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .benefits li {
+        color: rgba(255, 255, 255, 0.8);
+        padding: 6px 0;
+    }
+    
+    .benefits li:before {
+        content: "✓ ";
+        color: #4caf50;
+        font-weight: bold;
+        margin-right: 8px;
+    }
+    
+    .btn-container {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+    
+    .btn-container button,
+    .btn-container a {
+        flex: 1;
+    }
+    
+    .confidence-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .confidence-high {
+        background: rgba(76, 175, 80, 0.2);
+        color: #4caf50;
+    }
+    
+    .confidence-medium {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+    }
+    
+    .confidence-low {
+        background: rgba(244, 67, 54, 0.2);
+        color: #f44336;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="kyc-container">
+    <div class="kyc-header">
+        <h1><i class="fas fa-robot"></i> AI-Powered KYC Verification</h1>
+        <p>Instant document verification using advanced AI technology</p>
+    </div>
+    
+    <div class="benefits">
+        <h3><i class="fas fa-bolt"></i> Fast & Secure</h3>
+        <ul>
+            <li>Instant document recognition</li>
+            <li>Auto-approval for high confidence scores (>85%)</li>
+            <li>Advanced fraud detection</li>
+            <li>Encrypted processing</li>
+        </ul>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data" class="kyc-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="document_type"><i class="fas fa-id-card"></i> Document Type</label>
+            <select id="document_type" name="document_type" required>
+                <option value="">Select a document type...</option>
+                <option value="passport">Passport</option>
+                <option value="drivers_license">Driver's License</option>
+                <option value="national_id">National ID Card</option>
+                <option value="residence_permit">Residence Permit</option>
+                <option value="voter_id">Voter ID</option>
+                <option value="tax_id">Tax ID Card</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="document_image"><i class="fas fa-image"></i> Upload Document</label>
+            <div class="file-upload-area" onclick="document.getElementById('document_image').click()">
+                <input type="file" id="document_image" name="document_image" accept="image/*" required style="display: none;">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p><strong>Click or drag to upload</strong></p>
+                <p style="font-size: 0.85rem; margin-top: 8px;">JPEG or PNG, Max 10MB</p>
+            </div>
+        </div>
+        
+        <div class="btn-container">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-check-circle"></i> Verify Now
+            </button>
+            <a href="{% url 'kyc:upload' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </form>
+    
+    <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--border-color);">
+        <p style="color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">
+            <i class="fas fa-lock"></i> Your documents are encrypted and processed securely.
+        </p>
+    </div>
+</div>
+
+<script>
+    // Enhanced file upload area with drag and drop
+    const uploadArea = document.querySelector('.file-upload-area');
+    const fileInput = document.getElementById('document_image');
+    
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = 'var(--gold)';
+        uploadArea.style.background = 'rgba(255, 215, 0, 0.05)';
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.style.borderColor = 'var(--border-color)';
+        uploadArea.style.background = 'transparent';
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = 'var(--border-color)';
+        uploadArea.style.background = 'transparent';
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            uploadArea.innerHTML = `<i class="fas fa-check-circle" style="color: #4caf50;"></i><p>File selected: <strong>${files[0].name}</strong></p>`;
+        }
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            uploadArea.innerHTML = `<i class="fas fa-check-circle" style="color: #4caf50;"></i><p>File selected: <strong>${e.target.files[0].name}</strong></p>`;
+        }
+    });
+</script>
+{% endblock %}
