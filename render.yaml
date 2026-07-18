@@ -63,16 +63,17 @@ services:
         value: admin@elitewealthcapita.uk
       
       # Cloudflare R2 Storage (Media Files - Uploads, KYC, Receipts)
+      # Account: 31277d24f8b9b001c73c1a3e2866fd0e (bthailand998@gmail.com)
       - key: R2_ACCESS_KEY_ID
-        value: YOUR_R2_ACCESS_KEY_HERE  # Get from Cloudflare R2 dashboard
+        value: 1e1eb73cd2f5dc37a7e19414f29a4a19
       - key: R2_SECRET_ACCESS_KEY
-        value: YOUR_R2_SECRET_KEY_HERE  # Get from Cloudflare R2 dashboard
+        value: 1a41550f80f7ff53e30703ee3fa555222ab52d675b48d9cbc9d2949e0667c7ee
       - key: R2_BUCKET_NAME
-        value: elite-wealth-media
+        value: mysite
       - key: R2_ENDPOINT_URL
-        value: YOUR_R2_ENDPOINT_HERE  # https://ACCOUNT_ID.r2.cloudflarestorage.com
+        value: https://31277d24f8b9b001c73c1a3e2866fd0e.r2.cloudflarestorage.com
       - key: R2_CUSTOM_DOMAIN
-        value: ""  # Optional: media.elitewealthcapita.uk
+        value: ""  # Optional: media.elitewealthcapita.uk (can add later)
       
       # Cloudinary (Backward Compatibility for Existing Images)
       - key: CLOUDINARY_CLOUD_NAME
