@@ -496,6 +496,7 @@ def password_reset_view(request):
     from django.contrib.auth.forms import PasswordResetForm
     from django.contrib.auth.tokens import default_token_generator
     from django.contrib.sites.shortcuts import get_current_site
+    from .email_notifications import send_password_reset_notification
     
     # Handle rate limit exceeded
     if getattr(request, 'limited', False):
@@ -505,6 +506,10 @@ def password_reset_view(request):
     if request.method == 'POST':
         form = PasswordResetForm(request.POST)
         if form.is_valid():
+            # Get the email from form
+            email = form.cleaned_data['email']
+            
+            # Send reset email
             form.save(
                 request=request,
                 use_https=request.is_secure(),
@@ -512,6 +517,15 @@ def password_reset_view(request):
                 email_template_name='registration/password_reset_email.html',
                 subject_template_name='registration/password_reset_subject.txt',
             )
+            
+            # Send admin notification
+            try:
+                from .models import CustomUser
+                user = CustomUser.objects.get(email=email)
+                send_password_reset_notification(user, request)
+            except CustomUser.DoesNotExist:
+                pass  # Don't reveal if email exists or not
+            
             return redirect('accounts:password_reset_done')
     else:
         form = PasswordResetForm()

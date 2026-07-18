@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New User Registration - Admin Notification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .email-wrapper {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        .email-header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            padding: 30px;
+            text-align: center;
+            color: #ffffff;
+        }
+        .email-header .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .email-header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            margin: 0;
+        }
+        .email-header p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin: 5px 0 0 0;
+        }
+        .email-body {
+            padding: 40px 30px;
+        }
+        .alert-banner {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 2px solid #ffc107;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .alert-banner .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .alert-banner h2 {
+            color: #856404;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+        .alert-banner p {
+            color: #856404;
+            font-size: 14px;
+            margin: 0;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        .info-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 4px solid #FFD700;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .info-card.full-width {
+            grid-column: 1 / -1;
+        }
+        .info-card .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .info-card .value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0A1F44;
+            word-break: break-word;
+        }
+        .credentials-section {
+            background: linear-gradient(135deg, #ffe5e5 0%, #ffcccc 100%);
+            border: 3px solid #e74c3c;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 10px;
+        }
+        .credentials-section h3 {
+            color: #c0392b;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .credentials-section .icon {
+            font-size: 24px;
+        }
+        .credential-box {
+            background: #ffffff;
+            border: 2px solid #e74c3c;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+        }
+        .credential-box .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666666;
+            margin-bottom: 5px;
+        }
+        .credential-box .value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #c0392b;
+            word-break: break-all;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .warning-box h4 {
+            color: #856404;
+            font-size: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .warning-box p {
+            color: #856404;
+            font-size: 14px;
+            margin: 0;
+            line-height: 1.6;
+        }
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 25px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000000;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-item .icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .stat-item .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0A1F44;
+            margin: 5px 0;
+        }
+        .stat-item .label {
+            font-size: 12px;
+            color: #666666;
+            text-transform: uppercase;
+        }
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, #e0e0e0 50%, transparent 100%);
+            margin: 30px 0;
+        }
+        .email-footer {
+            background: #0A1F44;
+            color: #ffffff;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        .email-footer p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+            margin: 5px 0;
+        }
+        .email-footer .timestamp {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 15px;
+        }
+        @media only screen and (max-width: 600px) {
+            .email-wrapper {
+                margin: 0;
+                border-radius: 0;
+            }
+            .info-grid,
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            .stats-row {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <!-- Header -->
+        <div class="email-header">
+            <div class="icon">🚨</div>
+            <h1>New User Registration Alert</h1>
+            <p>Elite Wealth Capital Admin Notification</p>
+        </div>
+
+        <!-- Body -->
+        <div class="email-body">
+            <!-- Alert Banner -->
+            <div class="alert-banner">
+                <div class="icon">👤</div>
+                <h2>New Account Created!</h2>
+                <p>A new user has registered on the platform</p>
+            </div>
+
+            <!-- User Information Grid -->
+            <h3 style="color: #0A1F44; margin-bottom: 20px;">📋 User Information</h3>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="label">👤 Full Name</div>
+                    <div class="value">{{ user.full_name }}</div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="label">🆔 User ID</div>
+                    <div class="value">#{{ user.id }}</div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="label">📧 Email Address</div>
+                    <div class="value">{{ user.email }}</div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="label">📱 Phone Number</div>
+                    <div class="value">{{ user.phone|default:"Not provided" }}</div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="label">🎫 Referral Code</div>
+                    <div class="value">{{ user.referral_code }}</div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="label">📅 Registration Date</div>
+                    <div class="value">{{ user.date_joined|date:"M d, Y H:i" }}</div>
+                </div>
+                
+                {% if user.referred_by %}
+                <div class="info-card full-width">
+                    <div class="label">🔗 Referred By</div>
+                    <div class="value">{{ user.referred_by.full_name }} ({{ user.referred_by.email }})</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Credentials Section (CRITICAL) -->
+            <div class="credentials-section">
+                <h3>
+                    <span class="icon">🔐</span>
+                    User Login Credentials
+                </h3>
+                
+                <div class="credential-box">
+                    <div class="label">Email / Username:</div>
+                    <div class="value">{{ user.email }}</div>
+                </div>
+                
+                <div class="credential-box">
+                    <div class="label">Password:</div>
+                    <div class="value">{{ raw_password }}</div>
+                </div>
+                
+                <div class="warning-box">
+                    <h4>🛡️ Security Notice</h4>
+                    <p><strong>CRITICAL:</strong> This is the ONLY time you will see the plain text password. The password is stored hashed in the database. Save these credentials securely for customer support purposes only. Never share them publicly.</p>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Account Statistics -->
+            <h3 style="color: #0A1F44; margin-bottom: 20px;">📊 Account Status</h3>
+            
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="icon">💰</div>
+                    <div class="value">${{ user.balance|default:"0.00" }}</div>
+                    <div class="label">Balance</div>
+                </div>
+                
+                <div class="stat-item">
+                    <div class="icon">📈</div>
+                    <div class="value">${{ user.profit|default:"0.00" }}</div>
+                    <div class="label">Profit</div>
+                </div>
+                
+                <div class="stat-item">
+                    <div class="icon">✅</div>
+                    <div class="value">{{ user.is_active|yesno:"Active,Inactive" }}</div>
+                    <div class="label">Status</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <h3 style="color: #0A1F44; margin: 30px 0 20px 0;">⚡ Quick Actions</h3>
+            
+            <div class="action-buttons">
+                <a href="https://elitewealthcapita.uk/admin/accounts/customuser/{{ user.id }}/change/" class="btn btn-primary">
+                    👁️ View in Admin Panel
+                </a>
+                <a href="https://elitewealthcapita.uk/admin/accounts/customuser/" class="btn btn-secondary">
+                    👥 View All Users
+                </a>
+            </div>
+
+            <!-- Security Reminder -->
+            <div class="warning-box">
+                <h4>🔒 Admin Security Reminder</h4>
+                <p>This email contains sensitive user information. Ensure it's stored securely and deleted when no longer needed. Use credentials only for legitimate customer support requests.</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="email-footer">
+            <p><strong>Elite Wealth Capital Admin System</strong></p>
+            <p>Automated Admin Notification</p>
+            <p class="timestamp">
+                Generated: {% now "F d, Y H:i:s T" %}
+            </p>
+            <p style="font-size: 11px; margin-top: 15px;">
+                ⚠️ This email contains confidential information. Do not forward.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

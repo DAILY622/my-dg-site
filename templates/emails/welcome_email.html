@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Elite Wealth Capital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .email-header {
+            background: linear-gradient(135deg, #0A1F44 0%, #FFD700 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: #ffffff;
+        }
+        .email-header .logo {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .email-header .tagline {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0;
+        }
+        .email-body {
+            padding: 40px 30px;
+            background: #ffffff;
+        }
+        .welcome-icon {
+            text-align: center;
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        .email-body h1 {
+            color: #0A1F44;
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .email-body p {
+            color: #555555;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        .email-body p.greeting {
+            font-size: 18px;
+            color: #333333;
+            font-weight: 500;
+        }
+        .info-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 4px solid #FFD700;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .info-card h3 {
+            color: #0A1F44;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #333333;
+        }
+        .info-value {
+            color: #666666;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000000;
+            padding: 16px 40px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+        .button-wrapper {
+            text-align: center;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        .feature-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .feature-item .icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .feature-item h4 {
+            color: #0A1F44;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        .feature-item p {
+            font-size: 14px;
+            color: #666666;
+            margin: 0;
+        }
+        .bonus-alert {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 2px solid #28a745;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .bonus-alert .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .bonus-alert h3 {
+            color: #155724;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+        .bonus-alert .amount {
+            font-size: 32px;
+            font-weight: 700;
+            color: #28a745;
+            margin: 15px 0;
+        }
+        .bonus-alert p {
+            color: #155724;
+            margin: 0;
+        }
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, #e0e0e0 50%, transparent 100%);
+            margin: 30px 0;
+        }
+        .security-note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+        .security-note h4 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .security-note p {
+            color: #856404;
+            margin: 0;
+            font-size: 14px;
+        }
+        .email-footer {
+            background: #0A1F44;
+            color: #ffffff;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .email-footer .footer-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFD700;
+            margin-bottom: 15px;
+        }
+        .email-footer p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin: 8px 0;
+        }
+        .email-footer .social-links {
+            margin: 20px 0;
+        }
+        .email-footer .social-links a {
+            color: #FFD700;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 18px;
+        }
+        .email-footer .copyright {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 20px;
+        }
+        @media only screen and (max-width: 600px) {
+            .email-wrapper {
+                margin: 0;
+                border-radius: 0;
+            }
+            .email-header, .email-body, .email-footer {
+                padding: 30px 20px;
+            }
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <!-- Header -->
+        <div class="email-header">
+            <div class="logo">Elite Wealth Capital</div>
+            <p class="tagline">Professional Investment Management</p>
+        </div>
+
+        <!-- Body -->
+        <div class="email-body">
+            <div class="welcome-icon">🎉</div>
+            
+            <h1>Welcome to Your Investment Journey!</h1>
+            
+            <p class="greeting">Dear {{ user.full_name }},</p>
+            
+            <p>Congratulations on taking the first step towards building your financial future! We're thrilled to have you join the <strong>Elite Wealth Capital</strong> family.</p>
+            
+            <p>Your account has been successfully created and is ready to use. You can now access our comprehensive investment platform and start growing your wealth.</p>
+            
+            {% if bonus_amount %}
+            <!-- Bonus Alert -->
+            <div class="bonus-alert">
+                <div class="icon">🎁</div>
+                <h3>Welcome Bonus Credited!</h3>
+                <div class="amount">${{ bonus_amount }}</div>
+                <p>Your referral bonus has been added to your account balance.</p>
+            </div>
+            {% endif %}
+            
+            <!-- Account Info Card -->
+            <div class="info-card">
+                <h3>📋 Your Account Details</h3>
+                <div class="info-row">
+                    <span class="info-label">Account ID:</span>
+                    <span class="info-value">#{{ user.id }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">{{ user.email }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Referral Code:</span>
+                    <span class="info-value">{{ user.referral_code }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Registration Date:</span>
+                    <span class="info-value">{{ user.date_joined|date:"F d, Y" }}</span>
+                </div>
+            </div>
+            
+            <!-- CTA Button -->
+            <div class="button-wrapper">
+                <a href="https://elitewealthcapita.uk/dashboard/" class="cta-button">
+                    Go to Dashboard →
+                </a>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <!-- Features Grid -->
+            <h3 style="color: #0A1F44; text-align: center; margin-bottom: 20px;">What You Can Do Now</h3>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="icon">💰</div>
+                    <h4>Invest</h4>
+                    <p>Choose from various investment plans</p>
+                </div>
+                <div class="feature-item">
+                    <div class="icon">📊</div>
+                    <h4>Track ROI</h4>
+                    <p>Monitor your portfolio growth</p>
+                </div>
+                <div class="feature-item">
+                    <div class="icon">💳</div>
+                    <h4>Deposit & Withdraw</h4>
+                    <p>Easy crypto & fiat transactions</p>
+                </div>
+                <div class="feature-item">
+                    <div class="icon">🎫</div>
+                    <h4>Refer & Earn</h4>
+                    <p>Share your code, earn bonuses</p>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <!-- Security Note -->
+            <div class="security-note">
+                <h4>🔒 Security Tips</h4>
+                <p><strong>Never share your password</strong> with anyone. Enable two-factor authentication for extra security. Always verify the URL before logging in.</p>
+            </div>
+            
+            <p style="margin-top: 30px;">If you have any questions or need assistance, our support team is here to help 24/7.</p>
+            
+            <p style="margin-top: 20px;">
+                Best regards,<br>
+                <strong>The Elite Wealth Capital Team</strong>
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="email-footer">
+            <div class="footer-logo">Elite Wealth Capital</div>
+            <p>Professional Investment Management</p>
+            <p>London, United Kingdom</p>
+            
+            <div class="social-links">
+                <a href="https://elitewealthcapita.uk">🌐 Website</a>
+                <a href="mailto:admin@elitewealthcapita.uk">📧 Email</a>
+            </div>
+            
+            <div class="divider" style="background: rgba(255, 255, 255, 0.1); margin: 20px 0;"></div>
+            
+            <p class="copyright">
+                © 2026 Elite Wealth Capital. All rights reserved.
+            </p>
+            <p style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">
+                This is an automated message. Please do not reply to this email.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
