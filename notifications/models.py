@@ -30,11 +30,17 @@ class NotificationPreference(models.Model):
     push_on_kyc = models.BooleanField(default=True)
     push_on_referral = models.BooleanField(default=True)
     
-    # SMS notifications (if implemented)
+    # SMS notifications
     sms_enabled = models.BooleanField(default=False, help_text='Enable SMS notifications')
     sms_on_deposit = models.BooleanField(default=False)
     sms_on_withdrawal = models.BooleanField(default=True)
     sms_on_security = models.BooleanField(default=True)
+    
+    # Phone verification (SMS)
+    phone_number = models.CharField(max_length=20, blank=True, help_text='Phone number for SMS')
+    phone_verified = models.BooleanField(default=False, help_text='Phone number verified')
+    phone_verification_code = models.CharField(max_length=6, blank=True, help_text='6-digit verification code')
+    phone_verification_attempts = models.IntegerField(default=0, help_text='Failed verification attempts')
     
     # Notification sounds
     sound_enabled = models.BooleanField(default=True, help_text='Play sound for notifications')
@@ -45,6 +51,9 @@ class NotificationPreference(models.Model):
     
     # Marketing
     marketing_emails = models.BooleanField(default=True, help_text='Receive promotional emails')
+    
+    # Push device tracking
+    push_devices_count = models.IntegerField(default=0, help_text='Number of active push subscriptions')
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -148,3 +157,128 @@ class Notification(models.Model):
             priority=priority,
             action_url=action_url
         )
+
+
+class PushSubscription(models.Model):
+    """
+    Browser push notification subscriptions
+    Stores device subscription details for Web Push API
+    """
+    
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='push_subscriptions'
+    )
+    
+    # Push endpoint and keys
+    endpoint = models.CharField(max_length=1000, unique=True, help_text='Push service endpoint URL')
+    auth_key = models.CharField(max_length=255, help_text='Authentication key for this device')
+    p256dh_key = models.CharField(max_length=255, help_text='Public key for encryption')
+    
+    # Device info
+    user_agent = models.CharField(max_length=500, blank=True, help_text='Device user agent')
+    browser = models.CharField(
+        max_length=100, 
+        blank=True, 
+        help_text='Browser type (Chrome, Firefox, Safari, Edge)'
+    )
+    device_type = models.CharField(
+        max_length=50, 
+        default='web',
+        choices=[('web', 'Web'), ('mobile', 'Mobile'), ('tablet', 'Tablet')],
+        help_text='Type of device'
+    )
+    
+    # Status
+    is_active = models.BooleanField(default=True, help_text='Is subscription still valid')
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_used_at = models.DateTimeField(auto_now=True)
+    expires_at = models.DateTimeField(null=True, blank=True, help_text='Subscription expiration date')
+    
+    class Meta:
+        verbose_name = 'Push Subscription'
+        verbose_name_plural = 'Push Subscriptions'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'is_active']),
+            models.Index(fields=['is_active']),
+        ]
+    
+    def __str__(self):
+        return f"Push subscription for {self.user.email} ({self.browser})"
+    
+    def is_expired(self) -> bool:
+        """Check if subscription has expired"""
+        if self.expires_at:
+            return timezone.now() > self.expires_at
+        return False
+
+
+class SMSDelivery(models.Model):
+    """
+    SMS delivery tracking
+    Records all SMS sent via Twilio integration
+    """
+    
+    DELIVERY_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('sent', 'Sent'),
+        ('delivered', 'Delivered'),
+        ('failed', 'Failed'),
+        ('undelivered', 'Undelivered'),
+    ]
+    
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='sms_deliveries'
+    )
+    
+    phone_number = models.CharField(max_length=20, help_text='Recipient phone number')
+    message = models.TextField(help_text='SMS message content')
+    
+    # Status tracking
+    status = models.CharField(
+        max_length=20, 
+        choices=DELIVERY_STATUS_CHOICES, 
+        default='pending'
+    )
+    twilio_sid = models.CharField(
+        max_length=255, 
+        unique=True,
+        help_text='Twilio message SID for tracking'
+    )
+    error_message = models.TextField(blank=True, help_text='Error details if failed')
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
+    delivered_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        verbose_name = 'SMS Delivery'
+        verbose_name_plural = 'SMS Deliveries'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'status']),
+            models.Index(fields=['created_at']),
+            models.Index(fields=['twilio_sid']),
+        ]
+    
+    def __str__(self):
+        return f"SMS to {self.phone_number} ({self.status})"
+    
+    def mark_as_delivered(self):
+        """Mark SMS as delivered"""
+        self.status = 'delivered'
+        self.delivered_at = timezone.now()
+        self.save(update_fields=['status', 'delivered_at'])
+    
+    def mark_as_failed(self, error: str = ''):
+        """Mark SMS as failed"""
+        self.status = 'failed'
+        self.error_message = error
+        self.save(update_fields=['status', 'error_message'])

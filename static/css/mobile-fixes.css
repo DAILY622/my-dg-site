@@ -1,6 +1,7 @@
 /**
- * Mobile Responsive Fixes
- * Elite Wealth Capital - Fix mobile UI issues
+ * Mobile Responsive Fixes & Enhancements
+ * Elite Wealth Capital - Comprehensive mobile optimization
+ * Last Updated: 2026-07-18
  */
 
 /* ========================================
@@ -37,10 +38,87 @@
 }
 
 /* ========================================
+   MOBILE SIDEBAR COLLAPSE
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Hide sidebar by default on mobile */
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 280px;
+        height: 100vh;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        z-index: 9999;
+    }
+    
+    /* Show when active */
+    .sidebar.mobile-active {
+        transform: translateX(0);
+    }
+    
+    /* Main content full width */
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        transition: margin-left 0.3s ease;
+    }
+    
+    /* Backdrop */
+    .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 998;
+    }
+    
+    .sidebar-backdrop.active {
+        display: block;
+    }
+    
+    /* Mobile nav toggle button */
+    .mobile-menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        min-height: 48px;
+        padding: 0;
+        border: none;
+        background: var(--bg-card);
+        color: var(--text-primary);
+        cursor: pointer;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        transition: all 0.2s ease;
+        -webkit-touch-callout: none;
+        user-select: none;
+    }
+    
+    .mobile-menu-toggle:active {
+        background: rgba(255, 215, 0, 0.2);
+        transform: scale(0.95);
+    }
+    
+    .mobile-menu-toggle:focus {
+        outline: 2px solid var(--gold);
+        outline-offset: 2px;
+    }
+}
+
+/* ========================================
    DASHBOARD ICON - MOBILE FIX
    ======================================== */
 
-/* Ensure dashboard icon is visible on mobile */
 @media (max-width: 768px) {
     /* Dashboard button in mobile nav */
     .mobile-nav-dark button[onclick*="dashboard"],
@@ -82,25 +160,355 @@
     .mobile-nav-dark a {
         min-width: 60px;
         padding: 10px 5px;
+        min-height: 48px;
+        touch-action: manipulation;
     }
     
     /* Mobile nav icons */
     .mobile-nav-dark i {
         font-size: 1.4rem !important;
         margin-bottom: 3px;
+        display: block;
     }
     
     /* Mobile nav text */
     .mobile-nav-dark span {
         font-size: 0.65rem;
         white-space: nowrap;
+        display: block;
     }
     
     /* Active state */
     .mobile-nav-dark .active {
         color: var(--gold, #FFD700) !important;
         background: rgba(255, 215, 0, 0.15);
+        border-radius: 8px;
     }
+    
+    /* Ripple effect */
+    .mobile-nav-dark button:active,
+    .mobile-nav-dark a:active {
+        opacity: 0.7;
+    }
+}
+
+/* ========================================
+   CRYPTO TICKER MOBILE FIX
+   ======================================== */
+
+@media (max-width: 768px) {
+    .crypto-ticker-container {
+        margin: 0 -10px 15px;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        width: calc(100% + 20px);
+        margin-left: -10px;
+    }
+    
+    .crypto-ticker {
+        padding: 10px 0;
+    }
+    
+    .ticker-item {
+        padding: 0 15px;
+        min-width: 150px;
+    }
+    
+    .ticker-item img {
+        width: 20px;
+        height: 20px;
+        margin-right: 8px;
+    }
+    
+    .ticker-symbol {
+        font-size: 0.9rem;
+        margin-right: 6px;
+    }
+    
+    .ticker-price {
+        font-size: 0.85rem;
+        margin-right: 6px;
+    }
+    
+    .ticker-change {
+        font-size: 0.75rem;
+        padding: 1px 6px;
+    }
+}
+
+/* ========================================
+   WELCOME HEADER RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .welcome-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 15px 15px;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .welcome-left {
+        flex-direction: column;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .user-avatar-large {
+        width: 60px;
+        height: 60px;
+        font-size: 1.8rem;
+    }
+    
+    .welcome-content {
+        width: 100%;
+    }
+    
+    .welcome-content h1 {
+        font-size: 1.2rem;
+        margin: 10px 0 5px 0;
+    }
+    
+    .welcome-content p {
+        font-size: 0.9rem;
+        margin: 5px 0;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .welcome-right {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-header {
+        padding: 12px 12px;
+        margin-bottom: 12px;
+    }
+    
+    .user-avatar-large {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+    
+    .welcome-content h1 {
+        font-size: 1.1rem;
+    }
+    
+    .welcome-content p {
+        font-size: 0.85rem;
+    }
+}
+
+/* ========================================
+   TOUCH TARGET SIZING (48px minimum - WCAG AA)
+   ======================================== */
+
+@media (max-width: 768px) {
+    button, a[role="button"], input[type="button"],
+    input[type="submit"], .btn, .btn-link {
+        min-height: 48px;
+        min-width: 48px;
+        padding: 12px 16px;
+        touch-action: manipulation;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    
+    /* Card buttons */
+    .card-action button,
+    .card-action a {
+        padding: 14px 18px;
+        min-height: 48px;
+    }
+    
+    /* Navigation items */
+    nav a, nav button {
+        min-height: 44px;
+        padding: 12px 16px;
+    }
+    
+    /* Form controls */
+    .form-check-input {
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        min-height: 24px;
+        margin-top: 2px;
+        cursor: pointer;
+    }
+}
+
+/* ========================================
+   FORM INPUTS - MOBILE OPTIMIZED
+   ======================================== */
+
+@media (max-width: 768px) {
+    input, textarea, select {
+        font-size: 16px !important; /* Prevent iOS zoom on focus */
+        padding: 12px 14px;
+        min-height: 48px;
+        border-radius: 8px;
+        -webkit-appearance: none; /* Remove default iOS styling */
+        appearance: none;
+    }
+    
+    input[type="checkbox"],
+    input[type="radio"] {
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        min-height: 24px;
+        cursor: pointer;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+    
+    .form-group {
+        margin-bottom: 16px;
+    }
+    
+    /* Select dropdown styling */
+    select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23FFD700' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 36px;
+    }
+}
+
+/* ========================================
+   TABLES - MOBILE SCROLL
+   ======================================== */
+
+@media (max-width: 768px) {
+    table {
+        font-size: 0.9rem;
+        border-collapse: collapse;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid rgba(255, 215, 0, 0.2);
+        border-radius: 8px;
+    }
+    
+    th, td {
+        padding: 12px 8px;
+        white-space: nowrap;
+    }
+    
+    th {
+        background: rgba(255, 215, 0, 0.1);
+        font-weight: 600;
+        text-align: left;
+    }
+}
+
+/* ========================================
+   MODALS - MOBILE FULL SCREEN
+   ======================================== */
+
+@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 0;
+        max-width: none;
+        height: 100%;
+    }
+    
+    .modal-content {
+        border-radius: 20px 20px 0 0;
+        max-height: calc(100vh - 60px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        position: sticky;
+        top: 0;
+        background: var(--bg-dark);
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .modal-footer {
+        padding: 15px 20px;
+        border-top: 1px solid rgba(255, 215, 0, 0.2);
+        display: flex;
+        gap: 10px;
+    }
+}
+
+/* ========================================
+   CARDS - MOBILE STACKING
+   ======================================== */
+
+@media (max-width: 768px) {
+    .row > [class*='col-'] {
+        margin-bottom: 15px;
+    }
+    
+    .card {
+        margin-bottom: 15px;
+        border-radius: 15px;
+        border: 1px solid rgba(255, 215, 0, 0.15);
+    }
+    
+    .card-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .card-header {
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+    }
+    
+    .card-body {
+        padding: 15px;
+    }
+}
+
+/* ========================================
+   TEXT SIZE ADJUSTMENTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    h1 { font-size: 1.5rem; line-height: 1.3; }
+    h2 { font-size: 1.3rem; line-height: 1.3; }
+    h3 { font-size: 1.1rem; line-height: 1.4; }
+    h4 { font-size: 1rem; }
+    h5 { font-size: 0.95rem; }
+    h6 { font-size: 0.9rem; }
+    
+    body { font-size: 0.95rem; line-height: 1.5; }
+    small { font-size: 0.85rem; }
+    
+    p { margin-bottom: 12px; }
+}
+
+@media (max-width: 480px) {
+    h1 { font-size: 1.3rem; }
+    h2 { font-size: 1.1rem; }
+    h3 { font-size: 1rem; }
+    
+    body { font-size: 0.9rem; }
 }
 
 /* ========================================
@@ -125,7 +533,9 @@
     
     /* Page content spacing */
     .dashboard-theme-page {
+        padding: 15px;
         padding-bottom: 85px !important;
+        max-width: 100%;
     }
     
     /* Cards on mobile */
@@ -138,44 +548,36 @@
     .page-header-gold {
         padding: 15px 20px;
         border-radius: 15px;
+        margin-bottom: 15px;
     }
     
     .page-header-gold h1 {
         font-size: 1.3rem !important;
+        margin-bottom: 8px;
     }
     
     .page-header-gold h2 {
         font-size: 1.1rem !important;
+        margin-bottom: 5px;
     }
 }
 
 /* ========================================
-   SMALL MOBILE (< 480px)
+   SAFE AREA INSETS (Notch Support - iPhone X+)
    ======================================== */
 
-@media (max-width: 480px) {
-    /* Extra small screens */
-    .mobile-nav-dark button,
-    .mobile-nav-dark a {
-        min-width: 50px;
-        padding: 8px 3px;
+@supports (padding: max(0px)) {
+    body {
+        padding-left: max(0px, env(safe-area-inset-left));
+        padding-right: max(0px, env(safe-area-inset-right));
     }
     
-    .mobile-nav-dark i {
-        font-size: 1.2rem !important;
+    .sidebar {
+        padding-top: max(0px, env(safe-area-inset-top));
     }
     
-    .mobile-nav-dark span {
-        font-size: 0.6rem;
-    }
-    
-    /* Tawk widget even smaller */
-    #tawk-bubble-container {
-        transform: scale(0.65) !important;
-    }
-    
-    iframe[title="chat widget"] {
-        transform: scale(0.65) !important;
+    .mobile-nav-dark {
+        padding-bottom: max(0px, env(safe-area-inset-bottom));
     }
 }
 
@@ -194,25 +596,66 @@
     .tawk-chat-panel {
         max-height: calc(100vh - 120px) !important;
     }
+    
+    h1 { font-size: 1.2rem; }
+    h2 { font-size: 1rem; }
+    
+    body {
+        padding-bottom: 60px;
+    }
 }
 
 /* ========================================
-   ACCESSIBILITY
+   SMALL MOBILE (< 480px)
    ======================================== */
 
-/* Touch targets minimum size */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
+    /* Extra small screens */
     .mobile-nav-dark button,
     .mobile-nav-dark a {
-        min-height: 48px;
-        touch-action: manipulation;
+        min-width: 50px;
+        padding: 8px 3px;
+        min-height: 44px;
+    }
+    
+    .mobile-nav-dark i {
+        font-size: 1.2rem !important;
+    }
+    
+    .mobile-nav-dark span {
+        font-size: 0.6rem;
+    }
+    
+    /* Tawk widget even smaller */
+    #tawk-bubble-container {
+        transform: scale(0.65) !important;
+        bottom: 60px !important;
+    }
+    
+    iframe[title="chat widget"] {
+        transform: scale(0.65) !important;
+        bottom: 60px !important;
+    }
+    
+    /* Page spacing */
+    .page-header-gold {
+        padding: 12px 15px;
+    }
+    
+    .page-header-gold h1 {
+        font-size: 1.1rem !important;
     }
 }
+
+/* ========================================
+   ACCESSIBILITY & HIGH CONTRAST
+   ======================================== */
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
     .mobile-nav-dark {
         border-top-width: 2px;
+        border-top-color: var(--gold);
     }
     
     .mobile-nav-dark button,
@@ -222,6 +665,33 @@
     
     .mobile-nav-dark .active {
         border-color: var(--gold, #FFD700);
+        border-width: 2px;
+    }
+    
+    button, a[role="button"] {
+        border: 2px solid var(--gold);
+        border-radius: 6px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .crypto-ticker {
+        animation: none !important;
+    }
+}
+
+/* Dark mode (optional - if user prefers dark) */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: var(--bg-darkest);
+        color: var(--text-primary);
     }
 }
 
@@ -232,7 +702,19 @@
 @media print {
     .mobile-nav-dark,
     #tawk-bubble-container,
-    iframe[title="chat widget"] {
+    iframe[title="chat widget"],
+    .sidebar-backdrop,
+    .sidebar {
         display: none !important;
     }
+    
+    body {
+        padding-bottom: 0;
+    }
+    
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
 }
+

@@ -1,0 +1,97 @@
+# Elite Wealth Capital - Robots.txt
+# Last updated: 2026-07-18
+# This file tells search engines which pages to crawl and how to behave
+
+# ========================================
+# DEFAULT RULES
+# ========================================
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /accounts/login/
+Disallow: /accounts/register/
+Disallow: /accounts/password-reset/
+Disallow: /accounts/logout/
+Disallow: /dashboard/
+Disallow: /investments/
+Disallow: /kyc/
+Disallow: /notifications/
+Disallow: /api/
+Disallow: /static/
+Disallow: /media/
+Disallow: /test/
+Disallow: /health/
+Disallow: /debug/
+Disallow: *?sort=
+Disallow: *?filter=
+Disallow: *?page=
+Disallow: /api/docs/
+Disallow: /api/schema/
+Disallow: /api/redoc/
+
+# ========================================
+# SPECIFIC CRAWLERS
+# ========================================
+
+# Google
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /accounts/
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /static/
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /accounts/
+Disallow: /dashboard/
+Disallow: /api/
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+
+# Yandex
+User-agent: Yandex
+Allow: /
+
+# ========================================
+# CRAWL DELAY & REQUEST RATE
+# ========================================
+
+# Standard crawl delay (2 seconds between requests)
+User-agent: *
+Crawl-delay: 2
+Request-rate: 10/1s
+
+# Aggressive crawlers - more delays
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+# ========================================
+# SITEMAPS
+# ========================================
+
+Sitemap: https://portal.elitewealthcapita.uk/sitemap.xml
+Sitemap: https://elitewealthcapita.uk/sitemap.xml
+Sitemap: https://www.elitewealthcapita.uk/sitemap.xml
+
+# ========================================
+# ADDITIONAL COMMENTS
+# ========================================
+# - Authenticated pages are blocked (login-required content)
+# - API endpoints excluded from crawling
+# - Admin panel protected
+# - Static assets excluded to save bandwidth
+# - Real-time quotas/prices excluded
+# - User-generated content moderately restricted

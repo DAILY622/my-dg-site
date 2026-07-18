@@ -7,10 +7,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from django.http import HttpResponse
+from django.contrib.sitemaps.views import sitemap
 from dashboard import views as dashboard_views
 from investments.admin_api import verify_deposit_from_email, reject_deposit_from_email
 from kyc.admin_api import verify_kyc_from_email, reject_kyc_from_email
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+from elite_wealth_capital.sitemaps import sitemaps
 import os
 
 # PWA file serving views
@@ -61,6 +63,9 @@ urlpatterns = [
     path('manifest.json', serve_manifest, name='manifest'),
     path('sw.js', serve_service_worker, name='service_worker'),
     path('offline/', offline_view, name='offline'),
+    
+    # SEO - Robots.txt and Sitemap
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     
     # Admin panel
     path('admin/', admin.site.urls),
