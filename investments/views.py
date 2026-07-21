@@ -903,7 +903,8 @@ def download_investment_receipt(request, investment_id):
         pdf_buffer = generate_receipt('investment', investment)
         
         # Create filename
-        filename = f"investment_certificate_{investment.id}_{investment.start_date.strftime('%Y%m%d')}.pdf"
+        date_str = investment.start_date.strftime('%Y%m%d') if investment.start_date else timezone.now().strftime('%Y%m%d')
+        filename = f"investment_certificate_{investment.id}_{date_str}.pdf"
         
         # Return PDF as download
         response = FileResponse(pdf_buffer, content_type='application/pdf')
@@ -971,7 +972,8 @@ def view_investment_receipt(request, investment_id):
         pdf_buffer = generate_receipt('investment', investment)
         
         # Create filename
-        filename = f"investment_certificate_{investment.id}_{investment.start_date.strftime('%Y%m%d')}.pdf"
+        date_str = investment.start_date.strftime('%Y%m%d') if investment.start_date else timezone.now().strftime('%Y%m%d')
+        filename = f"investment_certificate_{investment.id}_{date_str}.pdf"
         
         # Return PDF for viewing in browser
         response = FileResponse(pdf_buffer, content_type='application/pdf')

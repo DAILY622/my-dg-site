@@ -6,6 +6,7 @@ from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from reportlab.lib.utils import ImageReader
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 from reportlab.pdfgen import canvas
@@ -165,7 +166,7 @@ class ReceiptGenerator:
         # QR Code for verification
         qr_data = f"https://portal.elitewealthcapita.uk/verify-receipt/{receipt_num}"
         qr_buffer = self._generate_qr_code(qr_data)
-        qr_img = Image(qr_buffer, width=1.5*inch, height=1.5*inch)
+        qr_img = Image(ImageReader(qr_buffer), width=1.5*inch, height=1.5*inch)
         story.append(qr_img)
         story.append(Spacer(1, 0.1*inch))
         story.append(Paragraph("Scan to verify receipt authenticity", self.styles['Normal']))
@@ -248,7 +249,7 @@ class ReceiptGenerator:
         # QR Code
         qr_data = f"https://portal.elitewealthcapita.uk/verify-certificate/{receipt_num}"
         qr_buffer = self._generate_qr_code(qr_data)
-        qr_img = Image(qr_buffer, width=1.5*inch, height=1.5*inch)
+        qr_img = Image(ImageReader(qr_buffer), width=1.5*inch, height=1.5*inch)
         story.append(qr_img)
         story.append(Spacer(1, 0.1*inch))
         story.append(Paragraph("Scan to verify certificate authenticity", self.styles['Normal']))
@@ -332,7 +333,7 @@ class ReceiptGenerator:
         # QR Code
         qr_data = f"https://portal.elitewealthcapita.uk/verify-receipt/{receipt_num}"
         qr_buffer = self._generate_qr_code(qr_data)
-        qr_img = Image(qr_buffer, width=1.5*inch, height=1.5*inch)
+        qr_img = Image(ImageReader(qr_buffer), width=1.5*inch, height=1.5*inch)
         story.append(qr_img)
         story.append(Spacer(1, 0.1*inch))
         story.append(Paragraph("Scan to verify receipt authenticity", self.styles['Normal']))
